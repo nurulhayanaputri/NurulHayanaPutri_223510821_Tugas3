@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js Activity List</title>
+    <script
+      src="https://cdn.jsdelivr.net/npm/vue@3.2.13/dist/vue.global.prod.js"></script>
+  </head>
+  <body>
+
+    <div id="app">
+      <div class="background">
+        <h1>Nurul Hayana Putri - 223510821</h1>
+        <p>Tabel kegiatan</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Kegiatan</th>
+              <th>Status</th>
+              <th>Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="activity in activities" :key="activity.id"
+              :class="{ completed: activity.completed }">
+              <td>
+                <template v-if="activity.id === editingActivity.id">
+                  <!-- Input untuk edit kegiatan -->
+                  <input type="text" v-model="editingActivity.name">
+                </template>
+                <template v-else>
+                  <!-- Tampilkan nama kegiatan -->
+                  <span
+                    :style="{ 'text-decoration': activity.completed ? 'line-through' : 'none' }">{{
+                    activity.name }}</span>
+                </template>
+              </td>
+              <td>
+                <span v-if="activity.completed">Telah Selesai</span>
+                <span v-else>Belum Selesai</span>
+                <input type="checkbox" v-model="activity.completed">
+              </td>
+              <td>
+                <template v-if="activity.id === editingActivity.id">
+                  <!-- Tombol simpan saat mode edit -->
+                  <button @click="saveActivity">Simpan</button>
+                </template>
+                <template v-else>
+                  <!-- Tombol edit dan hapus -->
+                  <button @click="editActivity(activity)">Edit</button>
+                  <button @click="cancelActivity(activity.id)">Hapus</button>
+                </template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+
+        <!-- Form untuk menambahkan kegiatan baru -->
+        <form @submit.prevent="addActivity">
+          <input type="text" v-model="newActivity"
+            placeholder="Tambahkan Kegiatan"> <br>
+          <button type="submit">Tambahkan</button>
+        </form>
+      </div>
+
+      <footer>
+        <p>&copy; 2024 Nurul Hayana Putri</p>
+      </footer>
+    </div>
+
+    <script>
+const { ref } = Vue;
+
+const app = Vue.createApp({
+  setup() {
+    const activities = ref([
+      { id: 1, name: 'Memasak', completed: false },
+      { id: 2, name: 'Shopping', completed: false },
+      { id: 3, name: 'Membaca Buku', completed: false },
+      { id: 4, name: 'Menari', completed: false },
+    ]);
+
+    const newActivity = ref('');
+    const editingActivity = ref({ id: null, name: '' });
+
+    function addActivity() {
+      if (newActivity.value.trim() !== '') {
+        activities.value.push({ id: Date.now(), name: newActivity.value, completed: false });
+        newActivity.value = '';
+      }
+    }
+
+    function cancelActivity(id) {
+      const index = activities.value.findIndex(activity => activity.id === id);
+      if (index !== -1) {
+        activities.value.splice(index, 1);
+      }
+    }
+
+    function editActivity(activity) {
+      editingActivity.value = { ...activity };
+    }
+
+    function saveActivity() {
+      const index = activities.value.findIndex(activity => activity.id === editingActivity.value.id);
+      if (index !== -1) {
+        activities.value[index].name = editingActivity.value.name;
+        editingActivity.value = { id: null, name: '' };
+      }
+    }
+
+    return { activities, newActivity, editingActivity, addActivity, cancelActivity, editActivity, saveActivity };
+  }
+});
+
+app.mount('#app');
+</script>
+
+    <style>
+
+  
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+
+.h1 {
+  text-align: center;
+}
+
+.background {
+  background-image: url(1.jpg);
+  color: white;
+  background-color: black;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.completed {
+  filter: blur(0.5px);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid white;
+  padding: 8px;
+  text-align: left;
+}
+
+.completed span {
+  text-decoration: line-through;
+}
+
+footer {
+  background-color: grey;
+  color: white;
+  text-align: center;
+  padding: 1px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+input[type="text"] {
+  width: 20%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+button[type="submit"] {
+  background-color: white;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+
+</style>
+
+  </body>
+</html>
